@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.spam_decliner_9000.data.model.UserListEntry
+import com.example.spam_decliner_9000.ui.utils.formatPhoneNumber
 
 @Composable
 fun BlocklistScreen(vm: BlocklistViewModel = hiltViewModel()) {
@@ -100,12 +101,12 @@ private fun NumberList(
                 headlineContent = {
                     // Show contact name as the primary label if available,
                     // otherwise fall back to the raw phone number
-                    Text(entry.contactName ?: entry.phoneNumber)
+                    Text(entry.contactName ?: formatPhoneNumber(entry.phoneNumber))
                 },
                 supportingContent = {
                     // If a name is shown above, show the number below it
                     if (entry.contactName != null) {
-                        Text(entry.phoneNumber)
+                        Text(formatPhoneNumber(entry.phoneNumber))
                     } else {
                         entry.note?.let { Text(it) }
                     }

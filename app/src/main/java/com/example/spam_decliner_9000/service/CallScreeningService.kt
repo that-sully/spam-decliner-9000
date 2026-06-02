@@ -46,6 +46,16 @@ class SpamCallScreeningService : CallScreeningService() {
     }
 
     override fun onScreenCall(callDetails: Call.Details) {
+        if (callDetails.callDirection == Call.Details.DIRECTION_OUTGOING) {
+            val phoneNumber = callDetails.handle?.schemeSpecificPart ?: "unknown"
+            Log.d(TAG, "Outgoing call to: $phoneNumber — allowing without screening")
+            serviceScope.launch {
+                repository.logCall(phoneNumber, source = "outgoing", outcome = "outgoing")
+            }
+            respondToCall(callDetails, buildAllowResponse())
+            return
+        }
+
         val phoneNumber = callDetails.handle?.schemeSpecificPart ?: run {
             // No number available (private/restricted) — check the toggle
             Log.d(TAG, "No phone number available (restricted/private)")
@@ -97,6 +107,15 @@ class SpamCallScreeningService : CallScreeningService() {
             Log.d(TAG, "On personal blocklist, blocking: $phoneNumber")
             repository.logCall(phoneNumber, source = "personal_blocklist", outcome = "blocked")
             return buildBlockResponse()
+        }
+
+        // 3b. Prior outgoing call — user has dialled this number before, so treat
+        //     it as implicitly trusted. Sits after the personal blocklist so an
+        //     explicit block still wins.
+        if (repository.hasPriorOutgoingCallTo(phoneNumber)) {
+            Log.d(TAG, "Prior outgoing call found, allowing: $phoneNumber")
+            repository.logCall(phoneNumber, source = "prior_outgoing", outcome = "allowed")
+            return buildAllowResponse()
         }
 
         // 4. Local spam database (FTC DNC complaint data)

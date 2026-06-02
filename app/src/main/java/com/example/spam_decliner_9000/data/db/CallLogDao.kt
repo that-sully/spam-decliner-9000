@@ -22,6 +22,9 @@ interface CallLogDao {
     @Query("DELETE FROM blocked_call_log WHERE id = :id")
     suspend fun delete(id: Long)
 
+    @Query("SELECT COUNT(*) > 0 FROM blocked_call_log WHERE phoneNumber = :phoneNumber AND outcome = 'outgoing'")
+    suspend fun hasOutgoingCallTo(phoneNumber: String): Boolean
+
     @Query("DELETE FROM blocked_call_log")
     suspend fun clearAll()
 }

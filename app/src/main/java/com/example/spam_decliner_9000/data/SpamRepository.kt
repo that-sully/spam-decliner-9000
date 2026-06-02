@@ -198,6 +198,11 @@ class SpamRepository @Inject constructor(
         category: String? = null
     ) = logCall(phoneNumber, source, outcome, category)
 
+    suspend fun hasPriorOutgoingCallTo(phoneNumber: String): Boolean {
+        val normalized = normalizeNumber(phoneNumber)
+        return callLogDao.hasOutgoingCallTo(normalized)
+    }
+
     suspend fun getBlockedCallHistory(limit: Int = 100): List<BlockedCallEntry> =
         callLogDao.getRecent(limit)
 

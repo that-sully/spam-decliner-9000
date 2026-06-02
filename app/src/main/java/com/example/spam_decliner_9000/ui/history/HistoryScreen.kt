@@ -12,6 +12,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.spam_decliner_9000.data.model.BlockedCallEntry
+import com.example.spam_decliner_9000.ui.utils.formatPhoneNumber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -96,7 +97,7 @@ private fun CallRow(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = entry.phoneNumber,
+                    text = formatPhoneNumber(entry.phoneNumber),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
@@ -146,6 +147,7 @@ private fun OutcomeChip(outcome: String) {
         "blocked"  -> "Blocked"  to MaterialTheme.colorScheme.error
         "voicemail"-> "Voicemail" to MaterialTheme.colorScheme.secondary
         "allowed"  -> "Allowed"  to MaterialTheme.colorScheme.primary
+        "outgoing" -> "Outgoing" to MaterialTheme.colorScheme.tertiary
         else       -> outcome    to MaterialTheme.colorScheme.onSurfaceVariant
     }
     Surface(

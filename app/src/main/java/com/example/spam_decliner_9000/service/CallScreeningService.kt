@@ -111,6 +111,7 @@ class SpamCallScreeningService : CallScreeningService() {
         //    If enabled, any number that is not in the user's device contacts
         //    is silently sent to voicemail. The user can listen to voicemail
         //    and decide whether to block or allowlist the number.
+        //    PhoneLookup is indexed — lookup is sub-millisecond even for large contact lists.
         val inContacts = repository.isInContacts(phoneNumber)
         if (settings.blockUnknownNumbers && !inContacts) {
             Log.d(TAG, "Block unknown toggle ON and not in contacts, sending to voicemail: $phoneNumber")
@@ -118,7 +119,7 @@ class SpamCallScreeningService : CallScreeningService() {
             return buildVoicemailResponse()
         }
 
-        // 6. Default — allow (log whether the number was a known contact or just unknown-but-allowed)
+        // 6. Default — allow; distinguish known contacts from cold unknowns in the log
         val allowSource = if (inContacts) "contact" else "default_allow"
         Log.d(TAG, "No match found, allowing: $phoneNumber (source=$allowSource)")
         repository.logCall(phoneNumber, source = allowSource, outcome = "allowed")
